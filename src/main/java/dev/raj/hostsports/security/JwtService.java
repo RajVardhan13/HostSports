@@ -1,8 +1,6 @@
 package dev.raj.hostsports.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,6 +47,20 @@ public class JwtService {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+
+    public Claims parseAndValidate(String token){
+        try {
+            return extractAllClaims(token);
+        } catch (ExpiredJwtException e){
+            throw new JwtAuthenticationException("Token has expired");
+        } catch (MalformedJwtException e){
+            throw new JwtAuthenticationException("Token is malformed");
+        } catch (SignatureException e){
+            throw new JwtAuthenticationException("Token signature is invalid");
+        } catch (Exception e){
+            throw new JwtAuthenticationException("Token is invalod");
+        }
     }
 
     private boolean isTokenExpired(String token) {

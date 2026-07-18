@@ -2,6 +2,7 @@ package dev.raj.hostsports.controller;
 
 import dev.raj.hostsports.dto.auth.AuthResponse;
 import dev.raj.hostsports.dto.auth.LoginRequest;
+import dev.raj.hostsports.dto.auth.RefreshTokenRequest;
 import dev.raj.hostsports.dto.auth.RegisterRequest;
 import dev.raj.hostsports.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,5 +31,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refreshToken(request));
     }
 }

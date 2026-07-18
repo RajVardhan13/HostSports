@@ -2,7 +2,9 @@ package dev.raj.hostsports.service.impl;
 
 import dev.raj.hostsports.dto.auth.AuthResponse;
 import dev.raj.hostsports.dto.auth.LoginRequest;
+import dev.raj.hostsports.dto.auth.RefreshTokenRequest;
 import dev.raj.hostsports.dto.auth.RegisterRequest;
+import dev.raj.hostsports.entity.RefreshToken;
 import dev.raj.hostsports.entity.Role;
 import dev.raj.hostsports.entity.User;
 import dev.raj.hostsports.exception.BadRequestException;
@@ -10,6 +12,7 @@ import dev.raj.hostsports.exception.DuplicateResourceException;
 import dev.raj.hostsports.repository.UserRepository;
 import dev.raj.hostsports.security.JwtService;
 import dev.raj.hostsports.service.AuthService;
+import dev.raj.hostsports.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +28,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     @Transactional
@@ -80,4 +84,41 @@ public class AuthServiceImpl implements AuthService {
                 .tokenType("Bearer")
                 .build();
     }
+
+    @Override
+    @Transactional
+    public AuthResponse refreshToken(RefreshTokenRequest request) {
+        RefreshToken storedToken = refreshTokenService.findByToken(request.getRefreshToken());
+        RefreshToken validToken = refreshTokenService.verifyExpiration(storedToken);
+        User user = validToken.getUser();
+
+        String newAccessToken = jwtService.generateToken(user);
+        RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user);
+
+        return AuthResponse.builder()
+                .userId(user.getId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .token(newAccessToken)
+                .refreshToken(newRefreshToken.getToken())
+                .tokenType("Bearer")
+                .build();
+    }
+
+    private AuthResponse buildAuthResponse(User user) {
+        String accessToken = jwtService.generateToken(user);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
+        return AuthResponse.builder()
+                .userId(user.getId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .token(accessToken)
+                .refreshToken(refreshToken.getToken())
+                .tokenType("Bearer")
+                .build();
+    }
+
 }
