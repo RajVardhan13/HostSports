@@ -8,6 +8,7 @@ import dev.raj.hostsports.exception.ResourceNotFoundException;
 import dev.raj.hostsports.exception.BadRequestException;
 import dev.raj.hostsports.mapper.MatchMapper;
 import dev.raj.hostsports.repository.*;
+import dev.raj.hostsports.service.AiMatchSummaryService;
 import dev.raj.hostsports.service.LeaderboardService;
 import dev.raj.hostsports.service.MatchService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class MatchServiceImpl implements MatchService {
     private final MatchMapper matchMapper;
     private final LeaderboardService leaderboardService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final AiMatchSummaryService aiMatchSummaryService;
 
     @Override
     @Transactional
@@ -101,6 +103,8 @@ public class MatchServiceImpl implements MatchService {
             messagingTemplate.convertAndSend(
                     "/topic/tournaments/" + tournamentId + "/leaderboard",
                     leaderboardService.getLeaderboard(tournamentId));
+
+            aiMatchSummaryService.generateAndBroadcastSummary(match);
         }
 
         return response;
