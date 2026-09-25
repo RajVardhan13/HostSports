@@ -41,6 +41,14 @@ public class Payment {
     @Column(nullable = false)
     private PaymentMode paymentMethod;
 
+    @Column(unique = true)
+    private String razorpayOrderId;
+
+    @Column(unique = true)
+    private String razorpayPaymentId;
+
+    private String razorpaySignature;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 

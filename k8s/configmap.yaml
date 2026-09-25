@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hostsports-config
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  DB_HOST: "mysql-service"
+  DB_NAME: "hostsports_prod"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka-service:9092"

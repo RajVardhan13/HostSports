@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
 
-
+                        .requestMatchers("/kafka/**").permitAll()
                         .requestMatchers("GET", "/api/venues/mine").hasAnyRole("VENUE_OWNER", "ADMIN")
                         .requestMatchers("GET", "/api/venues/**").permitAll()
                         .requestMatchers("GET", "/api/slots/**").permitAll()
