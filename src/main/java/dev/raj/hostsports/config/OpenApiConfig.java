@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
+    @Bean
     public OpenAPI hostMySportsOpenApi(){
         final String schemeName = "bearerAuth";
         return new OpenAPI()

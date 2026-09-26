@@ -36,6 +36,7 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/h2-console/**",
             "/ws/**",
+            "/error",
             "/api/ai/**"
     };
 

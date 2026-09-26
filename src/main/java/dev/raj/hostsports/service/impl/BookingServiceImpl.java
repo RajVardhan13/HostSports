@@ -8,6 +8,8 @@ import dev.raj.hostsports.entity.Slot;
 import dev.raj.hostsports.exception.BadRequestException;
 import dev.raj.hostsports.exception.ResourceNotFoundException;
 import dev.raj.hostsports.exception.SlotAlreadyBookedException;
+import dev.raj.hostsports.kafka.KafkaProducerService;
+import dev.raj.hostsports.kafka.event.BookingCreatedEvent;
 import dev.raj.hostsports.mapper.BookingMapper;
 import dev.raj.hostsports.repository.BookingRepository;
 import dev.raj.hostsports.repository.SlotRepository;
@@ -33,6 +35,7 @@ public class BookingServiceImpl implements BookingService {
     private final SlotRepository slotRepository;
     private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
+    private final KafkaProducerService kafkaProducerService;
 
     @Override
     @Transactional
@@ -59,7 +62,18 @@ public class BookingServiceImpl implements BookingService {
                 .totalAmount(totalAmount)
                 .build();
 
-        return bookingMapper.toResponse(bookingRepository.save(booking));
+        Booking savedBooking = bookingRepository.save(booking);
+
+        BookingCreatedEvent event = new BookingCreatedEvent(
+                savedBooking.getId(),
+                player.getId(),
+                slot.getId(),
+                savedBooking.getTotalAmount()
+        );
+
+        kafkaProducerService.sendBookingCreatedEvent(event);
+
+        return bookingMapper.toResponse(savedBooking);
     }
 
     private User resolveUser(UserDetails currentUser) {
