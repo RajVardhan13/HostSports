@@ -11,4 +11,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByPlayerOrderByBookedAtDesc(User player);
 
     Optional<Booking> findBySlotId(Long slotId);
+    List<Booking> findBySlotVenueOwnerIdOrderByBookedAtDesc(Long ownerId);
 }

@@ -19,6 +19,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import dev.raj.hostsports.entity.User;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,8 @@ public class BookingServiceImpl implements BookingService {
     private final SlotRepository slotRepository;
     private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
-    private final KafkaProducerService kafkaProducerService;
+    private final ApplicationEventPublisher eventPublisher;
+    //private final KafkaProducerService kafkaProducerService;
 
     @Override
     @Transactional
@@ -71,7 +73,8 @@ public class BookingServiceImpl implements BookingService {
                 savedBooking.getTotalAmount()
         );
 
-        kafkaProducerService.sendBookingCreatedEvent(event);
+        //kafkaProducerService.sendBookingCreatedEvent(event);
+        eventPublisher.publishEvent(event);
 
         return bookingMapper.toResponse(savedBooking);
     }
