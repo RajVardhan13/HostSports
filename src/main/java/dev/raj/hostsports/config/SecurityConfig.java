@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("GET", "/api/slots/**").permitAll()
                         .requestMatchers("/api/venues/**").hasAnyRole("VENUE_OWNER", "ADMIN")
                         .requestMatchers("/api/slots/**").hasAnyRole("VENUE_OWNER", "ADMIN")
+                        .requestMatchers("/api/notifications/**").authenticated()
                         .requestMatchers("/api/bookings/**").hasAnyRole("PLAYER", "ADMIN")
                         .requestMatchers("/api/payments/**").hasAnyRole("PLAYER", "ADMIN")
 
